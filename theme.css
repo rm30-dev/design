@@ -1,0 +1,273 @@
+/* ============================================================================
+   RM30 · theme.css — shared design foundations
+   ----------------------------------------------------------------------------
+   Syntax: Tailwind CSS v4 (@theme). Consumed identically by web (Next.js)
+   and mobile (Expo + uniwind).
+
+   This file has TWO layers:
+
+   1. RIGID SCALES — concrete values, IDENTICAL across all projects.
+      Never overridden or extended per project: if a value is not on the
+      scale, it doesn't get used.
+
+   2. COLOR ROLES — abstract. This file only declares the CONTRACT
+      (role name + light/dark pair); each project assigns the real values
+      in [project]/apps/blueprints/theme.css by redefining the private
+      --rm-* variables (example at the bottom of this file). The grays
+      below are neutral PLACEHOLDERS: they make the file self-consistent,
+      they are not an identity.
+
+   Typical consumption (same on web and mobile):
+
+       @import "tailwindcss";
+       @import "./rm30-theme.css";        ← this file
+       @import "./theme.css";             ← project identity (fills the roles)
+
+   Dark mode: every color role exists as a light/dark PAIR
+   (:root / .dark). This file only defines the pairs; activation is
+   per-platform — web: `.dark` class or a prefers-color-scheme mapping;
+   mobile: settings store → uniwind color scheme.
+   ========================================================================== */
+
+/* ============================================================================
+   1 · RIGID SCALES (identical across all projects)
+   ========================================================================== */
+
+@theme {
+  /* --- Spacing — 4px grid, closed set of steps -----------------------------
+     Tailwind's dynamic spacing scale is disabled: ONLY these steps exist.
+     An off-scale margin/padding is a mistake, not a choice. */
+  --spacing-*: initial;
+  --spacing-0: 0;
+  --spacing-px: 1px;
+  --spacing-0\.5: 0.125rem; /*  2px */
+  --spacing-1: 0.25rem;     /*  4px */
+  --spacing-2: 0.5rem;      /*  8px */
+  --spacing-3: 0.75rem;     /* 12px */
+  --spacing-4: 1rem;        /* 16px */
+  --spacing-5: 1.25rem;     /* 20px */
+  --spacing-6: 1.5rem;      /* 24px */
+  --spacing-8: 2rem;        /* 32px */
+  --spacing-10: 2.5rem;     /* 40px */
+  --spacing-12: 3rem;       /* 48px */
+  --spacing-16: 4rem;       /* 64px */
+  --spacing-20: 5rem;       /* 80px */
+
+  /* --- Type scale — xs→4xl, paired line-height -----------------------------
+     All in rem: text scales with user preferences (a11y). */
+  --text-*: initial;
+  --text-xs: 0.75rem;      --text-xs--line-height: 1rem;      /* 12/16 */
+  --text-sm: 0.875rem;     --text-sm--line-height: 1.25rem;   /* 14/20 */
+  --text-base: 1rem;       --text-base--line-height: 1.5rem;  /* 16/24 */
+  --text-lg: 1.125rem;     --text-lg--line-height: 1.75rem;   /* 18/28 */
+  --text-xl: 1.25rem;      --text-xl--line-height: 1.75rem;   /* 20/28 */
+  --text-2xl: 1.5rem;      --text-2xl--line-height: 2rem;     /* 24/32 */
+  --text-3xl: 1.875rem;    --text-3xl--line-height: 2.25rem;  /* 30/36 */
+  --text-4xl: 2.25rem;     --text-4xl--line-height: 2.5rem;   /* 36/40 */
+
+  /* --- Font weight — four weights, that's it --------------------------------
+     Mobile note: with custom fonts, each weight is a dedicated font file
+     (e.g. Font-Medium.ttf); the weight NAME stays the same. */
+  --font-weight-*: initial;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* --- Standalone line height (for targeted overrides) --------------------- */
+  --leading-*: initial;
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.75;
+
+  /* --- Radius -------------------------------------------------------------- */
+  --radius-*: initial;
+  --radius-none: 0;
+  --radius-sm: 0.375rem;  /*  6px */
+  --radius-md: 0.5rem;    /*  8px */
+  --radius-lg: 0.75rem;   /* 12px */
+  --radius-xl: 1rem;      /* 16px */
+  --radius-2xl: 1.5rem;   /* 24px */
+  --radius-full: 9999px;
+
+  /* Semantic radius roles: COMPONENTS use these, never the raw scale.
+     A project may re-point them to a different scale step (never to an
+     off-scale value). */
+  --radius-card: var(--radius-lg);
+  --radius-button: var(--radius-md);
+  --radius-input: var(--radius-md);
+  --radius-pill: var(--radius-full);
+
+  /* --- Shadow (elevation, web-first; on mobile prefer bg-raised) ----------- */
+  --shadow-*: initial;
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+}
+
+/* ============================================================================
+   2 · COLOR ROLES — the RM30 contract
+   ----------------------------------------------------------------------------
+   The map below is FIXED: components consume it through utilities
+   (bg-bg-surface, text-text-main, border-line, bg-ok-soft, …).
+   The VALUES live in the private --rm-* variables, in :root/.dark pairs:
+   that — and only that — is where a project intervenes.
+
+   Tailwind's default palette is disabled: a color without a role does not
+   exist. If a project needs one more color, it adds a ROLE in its own
+   theme.css (with a complete light/dark pair), never an inline value.
+   ========================================================================== */
+
+@theme inline {
+  --color-*: initial;
+
+  /* Brand — the project's identity */
+  --color-brand-primary: var(--rm-brand-primary);
+  --color-brand-deep: var(--rm-brand-deep);
+  --color-brand-soft: var(--rm-brand-soft);
+
+  /* Surfaces */
+  --color-bg-main: var(--rm-bg-main);
+  --color-bg-surface: var(--rm-bg-surface);
+  --color-bg-raised: var(--rm-bg-raised);
+
+  /* Lines */
+  --color-line: var(--rm-line);
+  --color-line-strong: var(--rm-line-strong);
+
+  /* Text */
+  --color-text-main: var(--rm-text-main);
+  --color-text-soft: var(--rm-text-soft);
+  --color-text-faint: var(--rm-text-faint);
+
+  /* Semantic */
+  --color-ok: var(--rm-ok);
+  --color-ok-soft: var(--rm-ok-soft);
+  --color-warn: var(--rm-warn);
+  --color-warn-soft: var(--rm-warn-soft);
+  --color-crit: var(--rm-crit);
+  --color-crit-soft: var(--rm-crit-soft);
+
+  /* Data series (charts) — optional: fill only if the project has dataviz */
+  --color-series-1: var(--rm-series-1);
+  --color-series-2: var(--rm-series-2);
+  --color-series-3: var(--rm-series-3);
+  --color-series-4: var(--rm-series-4);
+}
+
+/* ----------------------------------------------------------------------------
+   LIGHT pair — neutral placeholders. Every project MUST replace them.
+   The comment on each role declares its meaning: that is the contract.
+   -------------------------------------------------------------------------- */
+:root {
+  /* brand-primary: identity color — primary actions, accents, focus ring */
+  --rm-brand-primary: #525252;
+  /* brand-deep: reinforced brand — hover/pressed, brand text on brand-soft */
+  --rm-brand-deep: #262626;
+  /* brand-soft: muted brand — chip backgrounds, highlights, selections */
+  --rm-brand-soft: #e5e5e5;
+
+  /* bg-main: page/app background, the lowest layer */
+  --rm-bg-main: #f5f5f5;
+  /* bg-surface: primary surface — cards, panels, sheets */
+  --rm-bg-surface: #ffffff;
+  /* bg-raised: secondary/raised surface — table headers, row hover */
+  --rm-bg-raised: #ececec;
+
+  /* line: standard borders and dividers */
+  --rm-line: #e0e0e0;
+  /* line-strong: pronounced borders — inputs, interactive elements */
+  --rm-line-strong: #c2c2c2;
+
+  /* text-main: primary text — must hold AA on every bg-* surface */
+  --rm-text-main: #1a1a1a;
+  /* text-soft: secondary text — must hold AA on bg-surface */
+  --rm-text-soft: #525252;
+  /* text-faint: tertiary/decorative text — NEVER for essential content */
+  --rm-text-faint: #767676;
+
+  /* ok / warn / crit: positive outcome / attention / error-destructive.
+     The -soft variant is the muted background on which the full color is
+     readable (badges, alerts). Placeholders are deliberately identical:
+     the project MUST assign three hues distinguishable at a glance. */
+  --rm-ok: #3d3d3d;        --rm-ok-soft: #ebebeb;
+  --rm-warn: #3d3d3d;      --rm-warn-soft: #ebebeb;
+  --rm-crit: #3d3d3d;      --rm-crit-soft: #ebebeb;
+
+  /* series-1..4: categorical dataviz palette — hues must be distinguishable
+     from each other and readable on bg-surface */
+  --rm-series-1: #525252;
+  --rm-series-2: #6e6e6e;
+  --rm-series-3: #8a8a8a;
+  --rm-series-4: #a3a3a3;
+}
+
+/* ----------------------------------------------------------------------------
+   DARK pair — same structure, same roles. No role may exist without its
+   dark half. The `.dark` selector is the web convention; on mobile uniwind
+   resolves the pair from the color scheme set by the store.
+   -------------------------------------------------------------------------- */
+.dark {
+  --rm-brand-primary: #a3a3a3;
+  --rm-brand-deep: #d4d4d4;   /* in dark, "deep" = more contrast vs surface, hence lighter */
+  --rm-brand-soft: #2e2e2e;
+
+  --rm-bg-main: #111111;
+  --rm-bg-surface: #1a1a1a;
+  --rm-bg-raised: #242424;
+
+  --rm-line: #2e2e2e;
+  --rm-line-strong: #454545;
+
+  --rm-text-main: #ededed;
+  --rm-text-soft: #a6a6a6;
+  --rm-text-faint: #808080;
+
+  --rm-ok: #b0b0b0;        --rm-ok-soft: #2a2a2a;
+  --rm-warn: #b0b0b0;      --rm-warn-soft: #2a2a2a;
+  --rm-crit: #b0b0b0;      --rm-crit-soft: #2a2a2a;
+
+  --rm-series-1: #a3a3a3;
+  --rm-series-2: #8a8a8a;
+  --rm-series-3: #c2c2c2;
+  --rm-series-4: #d4d4d4;
+}
+
+/* ============================================================================
+   HOW A PROJECT FILLS THE ROLES
+   ----------------------------------------------------------------------------
+   [project]/apps/blueprints/theme.css imports this file and redefines
+   ONLY the --rm-* variables, always as a pair. The @theme map is never
+   touched.
+
+     @import "tailwindcss";
+     @import "./rm30-theme.css";
+
+     :root {
+       --rm-brand-primary: #6441df;
+       --rm-brand-deep:    #4c2fb8;
+       --rm-brand-soft:    #ece6fb;
+       --rm-bg-main:       #f8f9fe;
+       --rm-bg-surface:    #ffffff;
+       …every other role…
+     }
+
+     .dark {
+       --rm-brand-primary: #8b6cf0;
+       --rm-brand-deep:    #b39df5;
+       --rm-brand-soft:    #241b45;
+       --rm-bg-main:       #0d0b16;
+       --rm-bg-surface:    #14111f;
+       …every other role…
+     }
+
+   Project-specific extra role? Same discipline: a new --rm-* pair in
+   :root/.dark + one line in the project's own @theme inline:
+
+     @theme inline {
+       --color-glass: var(--rm-glass);
+     }
+   ========================================================================== */
